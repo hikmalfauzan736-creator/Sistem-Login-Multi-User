@@ -10,9 +10,9 @@
 
   <style>
     body {
-      background: linear-gradient(135deg, #020617, #0f172a);
-      min-height: 100vh;
+      background: #0f172a;
       color: white;
+      min-height: 100vh;
     }
     .card {
       background: #020617;
@@ -31,82 +31,202 @@
   </style>
 </head>
 
-<body class="p-6">
+<body class="flex">
 
-<div class="max-w-7xl mx-auto">
+  <!-- ============= SIDEBAR ============= -->
+  <div class="w-64 bg-black/40 h-screen p-6 space-y-4 border-r border-slate-700">
+    <h1 class="text-2xl font-bold text-sky-400 mb-6">Multi User OS</h1>
 
-  <!-- HEADER -->
-  <div class="card p-6 mb-6 flex flex-col md:flex-row justify-between items-center">
-    <div>
-      <h1 class="text-3xl font-bold text-sky-400">Sistem Login Multi-User</h1>
-      <p class="text-slate-400 text-sm">Simulasi Autentikasi, Isolasi User, Session & Akses Kernel</p>
-    </div>
-    <div class="flex gap-4 text-sm mt-4 md:mt-0">
-      <div class="bg-black/50 px-4 py-2 rounded">Session: <span id="activeCount">0</span></div>
-      <div class="bg-black/50 px-4 py-2 rounded">Status: <span id="statusText">Idle</span></div>
-    </div>
+    <button onclick="showPage('beranda')" 
+      class="w-full text-left p-3 rounded bg-slate-800 hover:bg-slate-700">
+      Beranda
+    </button>
+
+    <button onclick="showPage('simulator')" 
+      class="w-full text-left p-3 rounded bg-slate-800 hover:bg-slate-700">
+      Simulator
+    </button>
+
+    <button onclick="showPage('developer')" 
+      class="w-full text-left p-3 rounded bg-slate-800 hover:bg-slate-700">
+      Developer
+    </button>
   </div>
 
-  <!-- GRID -->
-  <div class="grid md:grid-cols-3 gap-6">
+  <!-- ============= MAIN CONTENT ============= -->
+  <div class="flex-1 p-6 overflow-y-auto">
 
-    <!-- LOGIN -->
-    <div class="card p-5">
-      <h2 class="text-xl font-semibold text-sky-400 mb-4">Login / Kelola User</h2>
+    <!-- ================= BERANDA ================= -->
+    <div id="beranda">
+      <h1 class="text-3xl font-bold text-sky-400 mb-4">Beranda</h1>
 
-      <input id="username" class="w-full p-2 mb-3 rounded bg-black border border-slate-700" placeholder="Username">
-      <input id="password" type="password" class="w-full p-2 mb-4 rounded bg-black border border-slate-700" placeholder="Password">
+      <div class="grid md:grid-cols-3 gap-6">
 
-      <div class="grid grid-cols-3 gap-2 mb-4">
-        <button onclick="login()" class="bg-sky-600 py-2 rounded">Login</button>
-        <button onclick="addUser()" class="bg-emerald-600 py-2 rounded">Tambah</button>
-        <button onclick="resetForm()" class="bg-yellow-600 py-2 rounded text-black">Reset</button>
-      </div>
-
-      <div class="bg-black/40 p-3 rounded text-sm">
-        <b>Session Aktif:</b>
-        <div id="sessionBox" class="mt-1 text-slate-300">Belum ada sesi</div>
-      </div>
-    </div>
-
-    <!-- USER LIST -->
-    <div class="card p-5">
-      <h2 class="text-xl font-semibold text-sky-400 mb-4">Daftar User</h2>
-      <div id="userList" class="space-y-3"></div>
-    </div>
-
-    <!-- MEMORY -->
-    <div class="card p-5">
-      <h2 class="text-xl font-semibold text-sky-400 mb-4">Kernel & Akses</h2>
-
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        <div id="kernelBox" class="bg-indigo-900 p-3 rounded text-center border border-indigo-400">
-          Kernel Space
+        <div class="card p-5">
+          <h2 class="text-xl font-semibold text-sky-300 mb-2">Autentikasi User</h2>
+          <p class="text-slate-300 text-sm">
+            Sistem multi-user mengizinkan banyak pengguna login ke sistem. 
+            Setiap user memiliki <b>username</b> dan <b>password</b> yang digunakan untuk proses autentikasi.
+          </p>
         </div>
-        <div id="userBox" class="bg-sky-900 p-3 rounded text-center border border-sky-400">
-          User Space
+
+        <div class="card p-5">
+          <h2 class="text-xl font-semibold text-sky-300 mb-2">Isolasi User</h2>
+          <p class="text-slate-300 text-sm">
+            Setiap user memiliki <b>home directory</b> masing-masing untuk memisahkan data.
+            User tidak dapat mengakses direktori lain tanpa izin admin atau kernel.
+          </p>
         </div>
+
+        <div class="card p-5">
+          <h2 class="text-xl font-semibold text-sky-300 mb-2">Kernel & User Space</h2>
+          <p class="text-slate-300 text-sm">
+            Sistem membagi ruang kerja menjadi <b>User Space</b> untuk user dan 
+            <b>Kernel Space</b> untuk interaksi tingkat sistem yang lebih tinggi.
+          </p>
+        </div>
+
+        <div class="card p-5">
+          <h2 class="text-xl font-semibold text-sky-300 mb-2">Session Management</h2>
+          <p class="text-slate-300 text-sm">
+            Sistem mencatat user yang sedang login. Hanya user aktif yang dapat melakukan operasi akses.
+          </p>
+        </div>
+
+        <div class="card p-5">
+          <h2 class="text-xl font-semibold text-sky-300 mb-2">Akses Admin</h2>
+          <p class="text-slate-300 text-sm">
+            Admin memiliki hak istimewa untuk mengakses direktori user lain serta manajemen sistem.
+          </p>
+        </div>
+
+        <div class="card p-5">
+          <h2 class="text-xl font-semibold text-sky-300 mb-2">Audit Log</h2>
+          <p class="text-slate-300 text-sm">
+            Semua aktivitas user dicatat untuk keamanan, termasuk login, tambah user, hapus user, dan akses direktori.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= SIMULATOR ================= -->
+    <div id="simulator" class="hidden">
+
+      <div class="max-w-7xl mx-auto">
+
+        <!-- HEADER -->
+        <div class="card p-6 mb-6 flex flex-col md:flex-row justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold text-sky-400">Sistem Login Multi-User</h1>
+            <p class="text-slate-400 text-sm">Simulasi Autentikasi, Isolasi User, Session & Akses Kernel</p>
+          </div>
+          <div class="flex gap-4 text-sm mt-4 md:mt-0">
+            <div class="bg-black/50 px-4 py-2 rounded">Session: <span id="activeCount">0</span></div>
+            <div class="bg-black/50 px-4 py-2 rounded">Status: <span id="statusText">Idle</span></div>
+          </div>
+        </div>
+
+        <!-- GRID -->
+        <div class="grid md:grid-cols-3 gap-6">
+
+          <!-- LOGIN -->
+          <div class="card p-5">
+            <h2 class="text-xl font-semibold text-sky-400 mb-4">Login / Kelola User</h2>
+
+            <input id="username" class="w-full p-2 mb-3 rounded bg-black border border-slate-700" placeholder="Username">
+            <input id="password" type="password" class="w-full p-2 mb-4 rounded bg-black border border-slate-700" placeholder="Password">
+
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              <button onclick="login()" class="bg-sky-600 py-2 rounded">Login</button>
+              <button onclick="addUser()" class="bg-emerald-600 py-2 rounded">Tambah</button>
+              <button onclick="resetForm()" class="bg-yellow-600 py-2 rounded text-black">Reset</button>
+            </div>
+
+            <div class="bg-black/40 p-3 rounded text-sm">
+              <b>Session Aktif:</b>
+              <div id="sessionBox" class="mt-1 text-slate-300">Belum ada sesi</div>
+            </div>
+          </div>
+
+          <!-- USER LIST -->
+          <div class="card p-5">
+            <h2 class="text-xl font-semibold text-sky-400 mb-4">Daftar User</h2>
+            <div id="userList" class="space-y-3"></div>
+          </div>
+
+          <!-- MEMORY -->
+          <div class="card p-5">
+            <h2 class="text-xl font-semibold text-sky-400 mb-4">Kernel & Akses</h2>
+
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div id="kernelBox" class="bg-indigo-900 p-3 rounded text-center border border-indigo-400">
+                Kernel Space
+              </div>
+              <div id="userBox" class="bg-sky-900 p-3 rounded text-center border border-sky-400">
+                User Space
+              </div>
+            </div>
+
+            <div id="accessLog" class="bg-black p-3 rounded text-sm mb-3">Belum ada akses</div>
+
+            <div id="kernelLog" class="bg-black text-green-400 p-3 rounded text-xs border border-green-600 font-mono">
+              [kernel] standby...
+            </div>
+          </div>
+
+        </div>
+
+        <!-- AUDIT LOG -->
+        <div class="card p-5 mt-6">
+          <h2 class="text-xl font-semibold text-sky-400 mb-4">Audit Log Sistem</h2>
+          <div id="auditLog" class="bg-black/60 p-3 rounded text-xs h-40 overflow-y-auto">
+            Sistem siap digunakan...
+          </div>
+        </div>
+
       </div>
 
-      <div id="accessLog" class="bg-black p-3 rounded text-sm mb-3">Belum ada akses</div>
+    </div>
 
-      <div id="kernelLog" class="bg-black text-green-400 p-3 rounded text-xs border border-green-600 font-mono">
-        [kernel] standby...
+    <!-- ================= DEVELOPER ================= -->
+    <div id="developer" class="hidden">
+      <h1 class="text-3xl font-bold text-sky-400 mb-4">Developer</h1>
+
+      <div class="card p-6 space-y-3 text-lg">
+        <p><b>Nama Pengembang:</b></p>
+        <p>Hikmal Akbar Fauzan</p>
+        <p>Wilton Gultom</p>
+        <p>Bisma Pangestu</p>
+        
+        <p><b>Universitas Siliwangi</b></p>
+        <p><b>Tahun:</b> 2025</p>
+        
+        <p><b>Tujuan Aplikasi:</b> 
+          Simulasi sistem login multi-user untuk memahami konsep OS:
+          autentikasi, isolasi user, kernel access, role, dan audit log.
+        </p>
       </div>
     </div>
 
   </div>
 
-  <!-- AUDIT LOG -->
-  <div class="card p-5 mt-6">
-    <h2 class="text-xl font-semibold text-sky-400 mb-4">Audit Log Sistem</h2>
-    <div id="auditLog" class="bg-black/60 p-3 rounded text-xs h-40 overflow-y-auto">
-      Sistem siap digunakan...
-    </div>
-  </div>
 
-</div>
+  <!-- ============= SCRIPT NAVIGATOR PAGE ============= -->
+<script>
+function showPage(page) {
+  document.getElementById("beranda").classList.add("hidden");
+  document.getElementById("simulator").classList.add("hidden");
+  document.getElementById("developer").classList.add("hidden");
 
+  document.getElementById(page).classList.remove("hidden");
+}
+
+// Set default halaman
+showPage("beranda");
+</script>
+
+<!-- ============= SCRIPT PROGRAM ASLI (UTUH) ============= -->
 <script>
 let users = [
   { id: 1, username: "Wilton", password: "12345", home: "/home/Wilton", role: "student", login: false },
