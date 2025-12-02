@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistem Login Multi-User</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #020617, #0f172a);
+      min-height: 100vh;
+      color: white;
+    }
+    .card {
+      background: #020617;
+      border-radius: 16px;
+      border: 1px solid #1e293b;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .pulse {
+      animation: pulseAnim 0.5s ease-in-out;
+    }
+    @keyframes pulseAnim {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+
+<body class="p-6">
+
+<div class="max-w-7xl mx-auto">
+
+  <!-- HEADER -->
+  <div class="card p-6 mb-6 flex flex-col md:flex-row justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-sky-400">Sistem Login Multi-User</h1>
+      <p class="text-slate-400 text-sm">Simulasi Autentikasi, Isolasi User, Session & Akses Kernel</p>
+    </div>
+    <div class="flex gap-4 text-sm mt-4 md:mt-0">
+      <div class="bg-black/50 px-4 py-2 rounded">Session: <span id="activeCount">0</span></div>
+      <div class="bg-black/50 px-4 py-2 rounded">Status: <span id="statusText">Idle</span></div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- LOGIN -->
+    <div class="card p-5">
+      <h2 class="text-xl font-semibold text-sky-400 mb-4">Login / Kelola User</h2>
+
+      <input id="username" class="w-full p-2 mb-3 rounded bg-black border border-slate-700" placeholder="Username">
+      <input id="password" type="password" class="w-full p-2 mb-4 rounded bg-black border border-slate-700" placeholder="Password">
+
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="login()" class="bg-sky-600 py-2 rounded">Login</button>
+        <button onclick="addUser()" class="bg-emerald-600 py-2 rounded">Tambah</button>
+        <button onclick="resetForm()" class="bg-yellow-600 py-2 rounded text-black">Reset</button>
+      </div>
+
+      <div class="bg-black/40 p-3 rounded text-sm">
+        <b>Session Aktif:</b>
+        <div id="sessionBox" class="mt-1 text-slate-300">Belum ada sesi</div>
+      </div>
+    </div>
+
+    <!-- USER LIST -->
+    <div class="card p-5">
+      <h2 class="text-xl font-semibold text-sky-400 mb-4">Daftar User</h2>
+      <div id="userList" class="space-y-3"></div>
+    </div>
+
+    <!-- MEMORY -->
+    <div class="card p-5">
+      <h2 class="text-xl font-semibold text-sky-400 mb-4">Kernel & Akses</h2>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div id="kernelBox" class="bg-indigo-900 p-3 rounded text-center border border-indigo-400">
+          Kernel Space
+        </div>
+        <div id="userBox" class="bg-sky-900 p-3 rounded text-center border border-sky-400">
+          User Space
+        </div>
+      </div>
+
+      <div id="accessLog" class="bg-black p-3 rounded text-sm mb-3">Belum ada akses</div>
+
+      <div id="kernelLog" class="bg-black text-green-400 p-3 rounded text-xs border border-green-600 font-mono">
+        [kernel] standby...
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AUDIT LOG -->
+  <div class="card p-5 mt-6">
+    <h2 class="text-xl font-semibold text-sky-400 mb-4">Audit Log Sistem</h2>
+    <div id="auditLog" class="bg-black/60 p-3 rounded text-xs h-40 overflow-y-auto">
+      Sistem siap digunakan...
+    </div>
+  </div>
+
+</div>
+
+<script>
+let users = [
+  { id: 1, username: "Wilton", password: "12345", home: "/home/Wilton", role: "student", login: false },
+  { id: 2, username: "Bisma", password: "12345", home: "/home/Bisma", role: "admin", login: false }
+];
+
+let activeUser = null;
+
+function renderUsers() {
+  const list = document.getElementById("userList");
+  list.innerHTML = "";
+
+  users.forEach(user => {
+    const div = document.createElement("div");
+    div.className = "p-3 rounded border flex justify-between items-center " + 
+      (user.login ? "bg-green-900 border-green-500" : "bg-black border-slate-700");
+
+    div.innerHTML = `
+      <div>
+        <b>${user.username}</b>
+        <div class="text-xs text-slate-400">${user.home}</div>
+      </div>
+      <div class="flex gap-1">
+        <button onclick="accessTest(${user.id})" class="bg-sky-600 px-2 py-1 rounded text-xs">Akses</button>
+        <button onclick="deleteUser(${user.id})" class="bg-red-600 px-2 py-1 rounded text-xs">Hapus</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+
+  document.getElementById("activeCount").innerText = users.filter(u => u.login).length;
+}
+
+function login() {
+  const u = username.value;
+  const p = password.value;
+
+  const user = users.find(x => x.username === u && x.password === p);
+  if (!user) {
+    setStatus("Login gagal");
+    logAudit("Login gagal: " + u);
+    return;
+  }
+
+  users.forEach(x => x.login = false);
+  user.login = true;
+  activeUser = user;
+
+  sessionBox.innerHTML = `
+    <b>${user.username}</b><br>
+    HOME: ${user.home}<br>
+    SHELL: /bin/bash
+  `;
+
+  setStatus("Login berhasil");
+  logAudit(user.username + " login ke sistem");
+  renderUsers();
+}
+
+function addUser() {
+  const u = username.value;
+  const p = password.value;
+  if (!u || !p) return alert("Isi username & password!");
+
+  users.push({
+    id: Date.now(),
+    username: u,
+    password: p,
+    home: "/home/" + u,
+    role: "student",
+    login: false
+  });
+
+  logAudit("User baru ditambahkan: " + u);
+  setStatus("User ditambahkan");
+  renderUsers();
+}
+
+function deleteUser(id) {
+  const target = users.find(u => u.id === id);
+  users = users.filter(u => u.id !== id);
+  logAudit("User dihapus: " + target.username);
+  renderUsers();
+}
+
+function resetForm() {
+  username.value = "";
+  password.value = "";
+  setStatus("Form direset");
+}
+
+function accessTest(id) {
+  const target = users.find(u => u.id === id);
+
+  if (!activeUser) {
+    accessLog.innerText = "Login terlebih dahulu!";
+    return;
+  }
+
+  animateKernel();
+
+  setTimeout(() => {
+    if (target.id === activeUser.id || activeUser.role === "admin") {
+      accessLog.innerText = "Akses ke " + target.home + " BERHASIL";
+      kernelLog.innerText = "[kernel] izin diberikan";
+      logAudit(activeUser.username + " berhasil akses " + target.home);
+    } else {
+      accessLog.innerText = "Akses ke " + target.home + " DITOLAK";
+      kernelLog.innerText = "[kernel] akses ditolak";
+      logAudit(activeUser.username + " ditolak akses ke " + target.home);
+    }
+  }, 400);
+}
+
+function animateKernel() {
+  kernelBox.classList.add("pulse");
+  userBox.classList.add("pulse");
+
+  setTimeout(() => {
+    kernelBox.classList.remove("pulse");
+    userBox.classList.remove("pulse");
+  }, 600);
+}
+
+function setStatus(text) {
+  statusText.innerText = text;
+}
+
+function logAudit(text) {
+  auditLog.innerHTML += "<br>- " + text;
+}
+
+renderUsers();
+</script>
+
+</body>
+</html>
